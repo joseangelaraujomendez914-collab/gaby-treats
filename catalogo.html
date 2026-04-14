@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaby's Treats | Catálogo de Delicias</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --rosa-vibrante: #ff4d6d;
+            --rosa-fresa: #c9184a;
+            --crema: #fff0f3;
+            --oro: #d4af37;
+            --blanco: #ffffff;
+            --texto-oscuro: #590d22;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--crema) 0%, #ffccd5 100%);
+            color: var(--texto-oscuro);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- BOTÓN SALIR --- */
+        .btn-salir {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2100;
+            background: var(--rosa-fresa);
+            color: white;
+            border: 2px solid var(--blanco);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-salir:hover {
+            background: var(--texto-oscuro);
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        /* --- LOGO EN LA ESQUINA --- */
+        .logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 20px 8px 8px;
+            border-radius: 50px;
+            border: 2px solid var(--oro);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            animation: bounceIn 1s ease;
+        }
+
+        .logo-frame {
+            width: 55px;
+            height: 55px;
+            background-color: var(--blanco);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--rosa-vibrante);
+            box-shadow: 0 0 10px rgba(255, 77, 109, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .logo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .logo-nombre {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.6rem;
+            color: var(--rosa-fresa);
+            font-weight: bold;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .container {
+            max-width: 1100px;
+            margin: 100px auto 0;
+        }
+
+        .header-catalogo {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-catalogo h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.8rem;
+            color: var(--rosa-fresa);
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px white;
+        }
+
+        /* --- PANEL AGREGAR PRODUCTO (ADMIN) --- */
+        #panel-admin-nuevo {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border: 2px dashed var(--oro);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .form-admin {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .form-admin input, .form-admin label {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .label-file {
+            background: #f8f9fa;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            border: 1px dashed var(--rosa-vibrante) !important;
+        }
+
+        /* --- GRID DE PRODUCTOS --- */
+        .grid-precios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+        }
+
+        .item-reposteria {
+            background: var(--blanco);
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(201, 24, 74, 0.08);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .img-box {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+            background: #eee;
+            cursor: pointer;
+        }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.6s ease;
+        }
+
+        .img-box:hover img {
+            transform: scale(1.1);
+        }
+
+        .precio-burbuja {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, var(--rosa-fresa), var(--rosa-vibrante));
+            color: white;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+
+        .info-producto {
+            padding: 25px;
+            text-align: center;
+        }
+
+        /* --- BOTONES --- */
+        .btn-ordenar {
+            background: linear-gradient(var(--rosa-vibrante), var(--rosa-fresa));
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 0 #a4133c;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-ordenar:hover { transform: translateY(-3px); }
+
+        .btn-cerrar-sesion {
+            background: #6c757d;
+            box-shadow: 0 4px 0 #495057;
+            margin-top: 10px;
+        }
+
+        /* --- VENTANA FLOTANTE (LIGHTBOX) --- */
+        .modal-foto {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            cursor: zoom-out;
+        }
+
+        .modal-foto img {
+            max-width: 95%;
+            max-height: 90vh;
+            border-radius: 15px;
+            border: 3px solid white;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            animation: zoomIn 0.3s ease;
+        }
+
+        /* --- ELEMENTOS MODO ADMIN --- */
+        .admin-edit-ui { display: none; }
+        
+        .btn-eliminar {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .input-admin-general {
+            width: 90%;
+            margin-bottom: 5px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--rosa-fresa);
+        }
+
+        .admin-trigger {
+            cursor: pointer;
+            background: var(--oro);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="https://www.google.com/?hl=es" class="btn-salir">Salir</a>
+
+    <div class="logo-container">
+        <div class="logo-frame">
+            <img src="LOGO-CATALOGO.PNG" alt="Gaby's Treats Logo">
+        </div>
+        <div class="logo-nombre">Gaby's Treats</div>
+    </div>
+
+    <div id="lightbox" class="modal-foto" onclick="cerrarImagen()">
+        <img id="img-full" src="" alt="Vista Previa">
+    </div>
+
+    <div class="container">
+        <header class="header-catalogo" data-aos="fade-down">
+            <h1>Gaby's Treats</h1>
+            <p>Delicias Caseras</p>
+        </header>
+
+        <div id="panel-admin-nuevo">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>✨ Añadir Nuevo Postre</h3>
+                <button class="btn-ordenar btn-cerrar-sesion" onclick="cerrarSesion()">🔒 Cerrar Sesión</button>
+            </div>
+            
+            <div class="form-admin">
+                <input type="text" id="new-nombre" placeholder="Nombre del postre">
+                <input type="text" id="new-precio" placeholder="Precio (ej: 15.00)">
+                <input type="text" id="new-desc" placeholder="Descripción breve">
+                
+                <label for="new-img-file" class="label-file" id="label-foto">
+                    📸 Seleccionar Foto de Galería
+                </label>
+                <input type="file" id="new-img-file" accept="image/*" style="display:none" onchange="previsualizarFoto(this)">
+                
+                <button class="btn-ordenar" style="background: #28a745; box-shadow: 0 4px 0 #1e7e34;" onclick="agregarProducto()">➕ Añadir al Catálogo</button>
+            </div>
+        </div>
+
+        <div class="grid-precios" id="contenedor-productos"></div>
+
+        <footer>
+            <p>© 2026 Gaby's Treats | Repostería con Amor</p>
+            <p style="font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">Anzoategui, Puerto la Cruz, Venezuela</p>
+            
+            <div id="admin-btn-root" class="admin-trigger" onclick="activarEdicion()">
+                🔒 Modo Administrador
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+
+        const productosIniciales = [
+            { nombre: "Pastel de Bodas Pink", precio: "25.00", img: "imagen-gaby.jpeg", desc: "Bizcocho esponjoso con crema batida." },
+            { nombre: "Pack de 6 Cupcakes", precio: "12.50", img: "imagen-gaby1.jpeg", desc: "Red velvet y chocolate intenso." }
+        ];
+
+        let productos = JSON.parse(localStorage.getItem('gaby_precios_v3')) || productosIniciales;
+        let modoEdicion = false;
+        let fotoTemporal = ""; 
+
+        function renderizarCatalogo() {
+            const grid = document.getElementById('contenedor-productos');
+            grid.innerHTML = "";
+
+            productos.forEach((p, index) => {
+                grid.innerHTML += `
+                    <div class="item-reposteria" data-aos="fade-up">
+                        <div class="precio-burbuja">
+                            <span class="txt-precio">$${p.precio}</span>
+                        </div>
+                        <div class="img-box" onclick="abrirImagen('${p.img}')">
+                            <img src="${p.img}" alt="${p.nombre}">
+                        </div>
+                        <div class="info-producto">
+                            <div class="admin-edit-ui" style="display: ${modoEdicion ? 'block' : 'none'}">
+                                <input type="text" class="input-admin-general" value="${p.nombre}" onchange="editarProducto(${index}, 'nombre', this.value)" placeholder="Nombre">
+                                <input type="text" class="input-admin-general" value="${p.precio}" onchange="editarProducto(${index}, 'precio', this.value)" placeholder="Precio">
+                                <textarea class="input-admin-general" onchange="editarProducto(${index}, 'desc', this.value)">${p.desc}</textarea>
+                                <button class="btn-eliminar" onclick="eliminarProducto(${index})">🗑️ Eliminar</button>
+                                <hr style="margin: 10px 0; opacity: 0.2;">
+                            </div>
+                            <h3 class="view-ui">${p.nombre}</h3>
+                            <p class="view-ui">${p.desc}</p>
+                            <button class="btn-ordenar" onclick="pedirWhatsApp('${p.nombre}', '${p.precio}')">Pedir Ahora</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- FUNCIONES DE IMAGEN FLOTANTE ---
+        function abrirImagen(src) {
+            const modal = document.getElementById('lightbox');
+            const imgFull = document.getElementById('img-full');
+            imgFull.src = src;
+            modal.style.display = 'flex';
+        }
+
+        function cerrarImagen() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+
+        // --- LÓGICA DE IMÁGENES (COMPRESIÓN) ---
+        function previsualizarFoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxW = 600; 
+                        const scale = maxW / img.width;
+                        canvas.width = maxW;
+                        canvas.height = img.height * scale;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        fotoTemporal = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('label-foto').innerText = "✅ Foto Lista";
+                        document.getElementById('label-foto').style.background = "#e1ffed";
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- SESIÓN ADMINISTRADOR ---
+        function activarEdicion() {
+            const password = prompt("Introduce la clave:");
+            if (password === "gaby123") {
+                modoEdicion = true;
+                document.getElementById('panel-admin-nuevo').style.display = 'block';
+                document.getElementById('admin-btn-root').style.display = 'none';
+                renderizarCatalogo();
+            } else {
+                alert("Clave incorrecta.");
+            }
+        }
+
+        function cerrarSesion() {
+            modoEdicion = false;
+            document.getElementById('panel-admin-nuevo').style.display = 'none';
+            document.getElementById('admin-btn-root').style.display = 'inline-block';
+            renderizarCatalogo();
+            alert("Sesión cerrada.");
+        }
+
+        function agregarProducto() {
+            const nombre = document.getElementById('new-nombre').value;
+            const precio = document.getElementById('new-precio').value;
+            const desc = document.getElementById('new-desc').value;
+
+            if(nombre && precio && fotoTemporal) {
+                productos.push({ nombre, precio, img: fotoTemporal, desc });
+                try {
+                    actualizarStorage();
+                    location.reload(); 
+                } catch(e) {
+                    alert("Memoria llena. Borra algunos productos viejos.");
+                }
+            } else {
+                alert("Completa los datos y selecciona una foto.");
+            }
+        }
+
+        function editarProducto(index, campo, valor) {
+            productos[index][campo] = valor;
+            actualizarStorage();
+        }
+
+        function eliminarProducto(index) {
+            if(confirm("¿Eliminar este postre?")) {
+                productos.splice(index, 1);
+                actualizarStorage();
+                renderizarCatalogo();
+            }
+        }
+
+        function actualizarStorage() {
+            localStorage.setItem('gaby_precios_v3', JSON.stringify(productos));
+        }
+
+        function pedirWhatsApp(producto, precio) {
+            const telefono = "584248459315";
+            const mensaje = `Hola Gaby's Treats! 🍰 Me gustaría pedir: ${producto} (Precio: $${precio}).`;
+            window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        renderizarCatalogo();
+    </script>
+</body>
+</html>
